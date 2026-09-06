@@ -53,23 +53,14 @@ button { border:0; border-radius:13px; padding:14px 16px; font:700 16px/1.2 inhe
 .caret { color:var(--muted); font-size:12px; }
 .total { margin-left:auto; color:var(--muted); font-size:13px; font-weight:400; }
 .tree-children { padding-left:24px; }
-.topic-row { display:flex; align-items:center; padding:0; gap:4px; text-decoration:none; border-bottom:1px solid var(--line); }
+.topic-row { display:flex; align-items:center; padding:16px; gap:12px; text-decoration:none; border-bottom:1px solid var(--line); }
 .topic-row:last-child { border-bottom:0; }
 .topic-row:active { background:var(--soft); }
-.topic-main { min-width:0; flex:1; display:flex; align-items:center; padding:16px; gap:12px; text-decoration:none; }
-.topic-main span:first-child,.topic-row > span:first-child { display:flex; flex-direction:column; }
+.topic-row span:first-child { display:flex; flex-direction:column; }
 .topic-row small { color:var(--muted); margin-top:2px; }
 .topic-row .count { margin-left:auto; background:var(--soft); color:var(--accent); border-radius:20px; min-width:35px; padding:3px 9px; text-align:center; font-size:14px; }
-.topic-row.all { color:var(--accent); padding:16px; }
-.preview-link { color:var(--accent); font-size:13px; font-weight:700; text-decoration:none; padding:20px 13px; border-left:1px solid var(--line); }
-.preview-head { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; margin-bottom:28px; }
-.preview-head h1 { margin-bottom:4px; }
-.preview-home { color:var(--accent); text-decoration:none; padding-top:12px; white-space:nowrap; }
-.preview-card { padding:28px 0 46px; border-top:2px solid var(--line); }
-.preview-card:first-child { border-top:0; }
-.preview-card .answer { display:block; }
-.preview-number { color:var(--muted); font-size:13px; }
+.topic-row.all { color:var(--accent); }
 table { width:100%; border-collapse:collapse; font-size:15px; }
 td,th { text-align:left; vertical-align:top; border-bottom:1px solid var(--line); padding:9px 7px; }
 mjx-container[jax="CHTML"][display="true"] { margin:.7em 0!important; background:transparent!important; }
-@media (max-width:480px) { .home-wrap { padding-top:42px; } .stage { min-width:auto; } .preview-link { padding-inline:10px; } }
+@media (max-width:480px) { .home-wrap { padding-top:42px; } .stage { min-width:auto; } }
