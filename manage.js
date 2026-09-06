@@ -8,7 +8,8 @@
 
   function cardRow(card, trashed = false) {
     const edited = CardStore.isEdited(card.ID) ? '<span class="edited-badge">Edited</span>' : "";
-    return `<article class="library-card" data-id="${escape(card.ID)}"><div><small>${escape(card.Topic)}</small><strong>${escape(card.Question)}</strong>${edited}</div><div class="row-actions">${trashed ? '<button data-action="restore">Restore</button>' : `<a href="edit.html?id=${encodeURIComponent(card.ID)}">Edit</a><button class="danger" data-action="trash">Trash</button>`}</div></article>`;
+    const custom = CardStore.isCustom(card.ID) ? '<span class="edited-badge custom-badge">Custom</span>' : "";
+    return `<article class="library-card" data-id="${escape(card.ID)}"><div><small>${escape(card.Topic)}</small><strong>${escape(card.Question)}</strong><div>${edited}${custom}</div></div><div class="row-actions">${trashed ? '<button data-action="restore">Restore</button>' : `<a href="edit.html?id=${encodeURIComponent(card.ID)}">Edit</a><button class="danger" data-action="trash">Trash</button>`}</div></article>`;
   }
 
   function render() {
@@ -44,6 +45,10 @@
   document.getElementById("emptyTrash").addEventListener("click", () => {
     if (!confirm("Permanently remove every card currently in the trash from this device?")) return;
     CardStore.emptyTrash(); render(); notify("Trash emptied");
+  });
+  document.getElementById("resetProgress").addEventListener("click", () => {
+    if (!confirm("Reset the green, red, and gray progress for every topic?")) return;
+    CardStore.resetProgress(); notify("Progress reset");
   });
   document.getElementById("exportData").addEventListener("click", async () => {
     const file = new File([CardStore.backup()], `data-science-quiz-${new Date().toISOString().slice(0,10)}.json`, {type:"application/json"});

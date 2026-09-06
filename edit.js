@@ -1,7 +1,8 @@
 (() => {
   const params = new URLSearchParams(location.search);
+  const isNew = params.get("new") === "1";
   const id = params.get("id");
-  const card = CardStore.find(id);
+  const card = isNew ? { Topic: "7 · Custom card", Question: "", Short: "<p></p>", Long: "<p></p>", Readings: "" } : CardStore.find(id);
   if (!card) { location.replace("manage.html"); return; }
   let backUrl = params.get("return") || "manage.html";
   try {
@@ -9,6 +10,15 @@
     backUrl = target.origin === location.origin ? target.href : "manage.html";
   } catch (_) { backUrl = "manage.html"; }
   document.getElementById("backLink").href = backUrl;
+  const deckInput = document.getElementById("deckInput");
+  for (const [code, topic] of Object.entries(QUIZ_DATA.topics)) {
+    const option = document.createElement("option"); option.value = code; option.textContent = `Topic ${code} · ${topic.title}`; deckInput.append(option);
+  }
+  deckInput.value = params.get("topic") && QUIZ_DATA.topics[params.get("topic")] ? params.get("topic") : "07";
+  document.getElementById("deckField").hidden = !isNew;
+  document.getElementById("editorTitle").textContent = isNew ? "Add card" : "Edit card";
+  document.getElementById("saveCard").textContent = isNew ? "Add card" : "Save card";
+  document.getElementById("restoreOriginal").hidden = isNew;
   const fields = {
     Topic: document.getElementById("topicInput"), Question: document.getElementById("questionInput"),
     Short: document.getElementById("shortInput"), Long: document.getElementById("longInput"), Readings: document.getElementById("readingsInput"),
@@ -19,6 +29,9 @@
   }
   const values = () => ({ Topic: fields.Topic.value, Question: fields.Question.value, Short: fields.Short.innerHTML, Long: fields.Long.innerHTML, Readings: fields.Readings.innerHTML });
   fill(card);
+  deckInput.addEventListener("change", () => {
+    if (/^\d+ · Custom card$/.test(fields.Topic.value)) fields.Topic.value = `${Number(deckInput.value)} · Custom card`;
+  });
 
   let activeEditor = fields.Short;
   [fields.Short, fields.Long, fields.Readings].forEach(editor => editor.addEventListener("focus", () => activeEditor = editor));
@@ -48,7 +61,9 @@
   document.getElementById("saveCard").addEventListener("click", () => {
     const value = values();
     if (!value.Question.trim() || !fields.Short.textContent.trim()) { alert("Question and short answer cannot be empty."); return; }
-    CardStore.edit(id, value); location.href = backUrl;
+    if (isNew) CardStore.create(deckInput.value, value);
+    else CardStore.edit(id, value);
+    location.href = backUrl;
   });
   document.getElementById("restoreOriginal").addEventListener("click", () => {
     if (!confirm("Discard your edits and restore the original card?")) return;

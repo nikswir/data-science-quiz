@@ -63,6 +63,13 @@ button { border:0; border-radius:13px; padding:14px 16px; font:700 16px/1.2 inhe
 .topic-row span:first-child { display:flex; flex-direction:column; }
 .topic-row small { color:var(--muted); margin-top:2px; }
 .topic-row .count { margin-left:auto; background:var(--soft); color:var(--accent); border-radius:20px; min-width:35px; padding:3px 9px; text-align:center; font-size:14px; }
+.progress-ring { --correct-angle:0deg; --wrong-angle:0deg; position:relative; flex:0 0 28px; width:28px; height:28px; margin-left:auto; border-radius:50%; background:conic-gradient(var(--good) 0 var(--correct-angle),var(--bad) var(--correct-angle) var(--wrong-angle),var(--line) var(--wrong-angle) 360deg); }
+.progress-ring::after { content:""; position:absolute; inset:5px; border-radius:50%; background:var(--surface); }
+.topic-row .progress-ring + .count { margin-left:0; }
+.progress-legend { display:flex; justify-content:center; flex-wrap:wrap; gap:8px 14px; margin:16px 4px 0; color:var(--muted); font-size:12px; }
+.progress-legend span { display:flex; align-items:center; gap:5px; }
+.progress-legend i { width:9px; height:9px; border-radius:50%; background:var(--line); }
+.progress-legend .green { background:var(--good); }.progress-legend .red { background:var(--bad); }.progress-legend .gray { background:var(--line); }
 .topic-row.all { color:var(--accent); }
 .manage-link { display:block; width:max-content; margin:24px auto; color:var(--accent); font-weight:700; text-decoration:none; }
 table { width:100%; border-collapse:collapse; font-size:15px; }
@@ -88,6 +95,9 @@ mjx-container[jax="CHTML"][display="true"] { margin:.7em 0!important; background
 .row-actions a,.row-actions button { background:transparent; color:var(--accent); padding:7px; font:700 13px/1 inherit; text-decoration:none; }
 .row-actions .danger { color:var(--bad); }
 .edited-badge { width:max-content; margin-top:5px; padding:2px 7px; border-radius:10px; background:var(--soft); color:var(--accent); font-size:11px; font-weight:700; }
+.edited-badge + .edited-badge { margin-left:5px; }
+.custom-badge { color:var(--good); }
+.add-card { background:var(--accent); color:#fff; border-color:var(--accent); text-decoration:none; }
 .trash-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .danger-button { background:var(--bad); color:#fff; }
 .danger-button:disabled { opacity:.4; }

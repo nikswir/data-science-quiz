@@ -10,9 +10,10 @@
   <script defer src="cards.js"></script><script defer src="card-store.js"></script><script defer src="edit.js"></script>
 </head>
 <body>
-  <header><div class="bar"><a class="back" id="backLink" href="manage.html" aria-label="Back">‹</a><strong>Edit card</strong></div></header>
+  <header><div class="bar"><a class="back" id="backLink" href="manage.html" aria-label="Back">‹</a><strong id="editorTitle">Edit card</strong></div></header>
   <main class="editor-wrap">
     <div id="editView">
+      <label class="field-label" id="deckField" hidden>Topic<select id="deckInput" class="text-input"></select></label>
       <label class="field-label">Topic<input id="topicInput" class="text-input"></label>
       <label class="field-label">Question<textarea id="questionInput" class="text-input question-input" rows="2"></textarea></label>
       <div class="editor-toolbar" aria-label="Formatting">

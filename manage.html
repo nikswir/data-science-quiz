@@ -14,8 +14,10 @@
   <main class="manage-wrap">
     <h1>Manage cards</h1>
     <div class="library-actions">
+      <a class="secondary add-card" href="edit.html?new=1">Add card</a>
       <button class="secondary" id="exportData">Export backup</button>
       <label class="secondary file-button">Import backup<input id="importData" type="file" accept="application/json,.json"></label>
+      <button class="secondary" id="resetProgress">Reset progress</button>
     </div>
     <p class="storage-note">Edits are saved in this browser. Export a backup before clearing Safari data or changing devices.</p>
     <div class="tabs" role="tablist"><button class="tab active" data-tab="active">Active <span id="activeCount"></span></button><button class="tab" data-tab="trash">Trash <span id="trashCount"></span></button></div>

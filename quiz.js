@@ -51,6 +51,7 @@
     $("answer").classList.remove("visible"); $("longBox").open = false; $("readingBox").open = false;
     $("topic").textContent = card.Topic; $("question").textContent = card.Question;
     $("short").innerHTML = card.Short; $("long").innerHTML = card.Long; $("readings").innerHTML = card.Readings;
+    $("longBox").hidden = !card.Long.trim();
     $("readingBox").hidden = !card.Readings.trim();
     $("editCard").href = `edit.html?id=${encodeURIComponent(card.ID)}&return=${encodeURIComponent("quiz.html" + location.search)}`;
     const final = state.stage === "final";
@@ -68,6 +69,7 @@
   }
   function grade(correct) {
     if (!revealed) return;
+    CardStore.recordResult(state.current, correct);
     state.attempts++;
     if (state.stage === "training") {
       const previous = state.current;
