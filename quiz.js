@@ -1,11 +1,19 @@
 (() => {
   const $ = id => document.getElementById(id);
+  const quizData = CardStore.effectiveData();
   const params = new URLSearchParams(location.search);
-  const available = Object.keys(QUIZ_DATA.topics);
+  const available = Object.keys(quizData.topics);
   const requested = (params.get("topics") || available.join(",")).split(",");
   const topicIds = requested.filter(x => available.includes(x)).sort();
   if (!topicIds.length) topicIds.push(...available);
-  const cards = topicIds.flatMap(code => QUIZ_DATA.topics[code].cards);
+  const cards = topicIds.flatMap(code => quizData.topics[code].cards);
+  if (!cards.length) {
+    $("cardView").style.display = "none"; $("controls").style.display = "none";
+    $("result").classList.add("visible"); $("resultTitle").textContent = "No active cards";
+    $("resultText").textContent = "Restore cards from the trash or choose another topic.";
+    $("newSession").style.display = "none";
+    return;
+  }
   const byId = Object.fromEntries(cards.map(card => [card.ID, card]));
   const allIds = cards.map(card => card.ID);
   const storageKey = "data-science-quiz-session-v3:" + topicIds.join(",");
@@ -43,6 +51,8 @@
     $("answer").classList.remove("visible"); $("longBox").open = false; $("readingBox").open = false;
     $("topic").textContent = card.Topic; $("question").textContent = card.Question;
     $("short").innerHTML = card.Short; $("long").innerHTML = card.Long; $("readings").innerHTML = card.Readings;
+    $("readingBox").hidden = !card.Readings.trim();
+    $("editCard").href = `edit.html?id=${encodeURIComponent(card.ID)}&return=${encodeURIComponent("quiz.html" + location.search)}`;
     const final = state.stage === "final";
     $("stage").textContent = final ? `Final ${state.finals}` : "Training";
     $("stage").classList.toggle("final", final);
@@ -93,6 +103,7 @@
   $("wrong").addEventListener("click", () => grade(false));
   $("correct").addEventListener("click", () => grade(true));
   $("newSession").addEventListener("click", restart);
+  $("trashCard").addEventListener("click", () => { CardStore.trash(state.current); location.reload(); });
   $("resetSession").addEventListener("click", () => {
     if (confirm("Start this session again from the beginning?")) restart();
   });

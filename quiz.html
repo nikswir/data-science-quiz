@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="styles.css">
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
   <script defer src="cards.js"></script>
+  <script defer src="card-store.js"></script>
   <script defer src="quiz.js"></script>
 </head>
 <body>
@@ -21,7 +22,7 @@
   </div></header>
   <main class="wrap">
     <div id="cardView">
-      <div class="topic" id="topic"></div><h1 id="question"></h1>
+      <div class="card-heading"><div class="topic" id="topic"></div><div class="card-actions"><a id="editCard" class="icon-action" aria-label="Edit card">Edit</a><button id="trashCard" class="icon-action danger" aria-label="Move card to trash">Trash</button></div></div><h1 id="question"></h1>
       <section class="answer" id="answer">
         <h2>Short answer</h2><div class="short" id="short"></div>
         <details id="longBox"><summary>Long answer</summary><div id="long"></div></details>
@@ -30,8 +31,8 @@
       <div class="pool-status" id="poolStatus"></div>
     </div>
     <section class="result" id="result">
-      <div class="result-icon">✓</div><h1>Final passed</h1>
-      <p>You answered every selected question correctly in one final round.</p>
+      <div class="result-icon">✓</div><h1 id="resultTitle">Final passed</h1>
+      <p id="resultText">You answered every selected question correctly in one final round.</p>
       <button class="primary" id="newSession">Start a new session</button>
       <a class="text-link" href="index.html">Choose topics</a>
     </section>

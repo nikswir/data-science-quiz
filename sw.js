@@ -1,5 +1,5 @@
-const CACHE = "data-science-quiz-v2";
-const LOCAL = ["./", "./index.html", "./quiz.html", "./styles.css", "./quiz.js", "./cards.js", "./manifest.webmanifest", "./icon.svg"];
+const CACHE = "data-science-quiz-v3";
+const LOCAL = ["./", "./index.html", "./quiz.html", "./manage.html", "./edit.html", "./styles.css", "./quiz.js", "./cards.js", "./card-store.js", "./home.js", "./manage.js", "./edit.js", "./manifest.webmanifest", "./icon.svg"];
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(LOCAL))));
 self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))));
 self.addEventListener("fetch", event => {

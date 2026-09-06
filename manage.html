@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f9">
+  <title>Manage cards · Data Science Quiz</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="cards.js"></script><script defer src="card-store.js"></script><script defer src="manage.js"></script>
+</head>
+<body>
+  <header><div class="bar"><a class="back" href="index.html" aria-label="Back">‹</a><strong>Card library</strong></div></header>
+  <main class="manage-wrap">
+    <h1>Manage cards</h1>
+    <div class="library-actions">
+      <button class="secondary" id="exportData">Export backup</button>
+      <label class="secondary file-button">Import backup<input id="importData" type="file" accept="application/json,.json"></label>
+    </div>
+    <p class="storage-note">Edits are saved in this browser. Export a backup before clearing Safari data or changing devices.</p>
+    <div class="tabs" role="tablist"><button class="tab active" data-tab="active">Active <span id="activeCount"></span></button><button class="tab" data-tab="trash">Trash <span id="trashCount"></span></button></div>
+    <section id="activePanel"></section>
+    <section id="trashPanel" hidden><div class="trash-head"><p>Cards stay here until you restore them or empty the trash.</p><button class="danger-button" id="emptyTrash">Empty trash</button></div><div id="trashList"></div></section>
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+</body>
+</html>

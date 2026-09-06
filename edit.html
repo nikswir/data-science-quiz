@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f9">
+  <title>Edit card · Data Science Quiz</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <script defer src="cards.js"></script><script defer src="card-store.js"></script><script defer src="edit.js"></script>
+</head>
+<body>
+  <header><div class="bar"><a class="back" id="backLink" href="manage.html" aria-label="Back">‹</a><strong>Edit card</strong></div></header>
+  <main class="editor-wrap">
+    <div id="editView">
+      <label class="field-label">Topic<input id="topicInput" class="text-input"></label>
+      <label class="field-label">Question<textarea id="questionInput" class="text-input question-input" rows="2"></textarea></label>
+      <div class="editor-toolbar" aria-label="Formatting">
+        <button data-command="bold"><b>Bold</b></button><button data-block="p">Paragraph</button><button data-block="h3">Heading</button><button id="insertSection">Add section</button>
+      </div>
+      <label class="field-label">Short answer<div id="shortInput" class="rich-input" contenteditable="true"></div></label>
+      <label class="field-label">Long answer<div id="longInput" class="rich-input long-input" contenteditable="true"></div></label>
+      <label class="field-label">Formula pronunciation<div id="readingsInput" class="rich-input" contenteditable="true"></div></label>
+      <p class="editor-hint">Formulas appear as LaTeX while editing. Keep the text between <code>\(</code> and <code>\)</code> intact unless you want to change the formula.</p>
+    </div>
+    <section id="previewView" class="editor-preview" hidden>
+      <div class="topic" id="previewTopic"></div><h1 id="previewQuestion"></h1>
+      <h2>Short answer</h2><div class="short" id="previewShort"></div>
+      <h2>Long answer</h2><div id="previewLong"></div>
+      <h2>Formula pronunciation</h2><div class="readings" id="previewReadings"></div>
+    </section>
+    <div class="editor-footer">
+      <button class="secondary" id="togglePreview">Preview</button>
+      <button class="secondary" id="restoreOriginal">Restore original</button>
+      <button class="primary" id="saveCard">Save card</button>
+    </div>
+  </main>
+</body>
+</html>
