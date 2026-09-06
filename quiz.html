@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f9">
+  <title>Data Science Quiz</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <script defer src="cards.js"></script>
+  <script defer src="quiz.js"></script>
+</head>
+<body>
+  <header><div class="bar">
+    <a class="back" href="index.html" aria-label="Choose topics">‹</a>
+    <div class="stage" id="stage">Training</div>
+    <div class="progress"><span id="progress"></span></div><div id="counter"></div>
+    <button class="reset" id="resetSession" aria-label="Restart session">↻</button>
+  </div></header>
+  <main class="wrap">
+    <div id="cardView">
+      <div class="topic" id="topic"></div><h1 id="question"></h1>
+      <section class="answer" id="answer">
+        <h2>Short answer</h2><div class="short" id="short"></div>
+        <details id="longBox"><summary>Long answer</summary><div id="long"></div></details>
+        <details id="readingBox"><summary>Formula pronunciation</summary><div class="readings" id="readings"></div></details>
+      </section>
+      <div class="pool-status" id="poolStatus"></div>
+    </div>
+    <section class="result" id="result">
+      <div class="result-icon">✓</div><h1>Final passed</h1>
+      <p>You answered every selected question correctly in one final round.</p>
+      <button class="primary" id="newSession">Start a new session</button>
+      <a class="text-link" href="index.html">Choose topics</a>
+    </section>
+  </main>
+  <div class="controls" id="controls"><div class="buttons">
+    <button class="primary" id="showAnswer">Show answer</button>
+    <button class="wrong" id="wrong">Didn’t answer</button>
+    <button class="correct" id="correct">Answered</button>
+  </div></div>
+</body>
+</html>

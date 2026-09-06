@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f9">
+  <title>Data Science Quiz</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="home">
+  <main class="home-wrap">
+    <div class="eyebrow">Quiz trainer</div>
+    <h1>Data Science</h1>
+    <p class="lead">Choose one topic or train all available questions together.</p>
+    <section class="tree" aria-label="Quiz topics">
+      <div class="tree-root"><span class="caret">▼</span><strong>Data Science Quiz</strong><span class="total">21 questions</span></div>
+      <div class="tree-children">
+        <a class="topic-row all" href="quiz.html?topics=02,03"><span><b>All topics</b><small>Topics 02–03</small></span><span class="count">21</span></a>
+        <a class="topic-row" href="quiz.html?topics=02"><span><b>Topic 02</b><small>Probability Foundations</small></span><span class="count">11</span></a>
+        <a class="topic-row" href="quiz.html?topics=03"><span><b>Topic 03</b><small>Probability Distributions</small></span><span class="count">10</span></a>
+      </div>
+    </section>
+  </main>
+  <script>if (location.protocol === "https:" && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
+</body>
+</html>
