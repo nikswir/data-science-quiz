@@ -73,7 +73,7 @@
     get user() { return user; }, get status() { return status; },
     async signIn(email) {
       if (!client) throw new Error("Cloud sign-in is unavailable.");
-      const redirect = new URL("manage.html", location.href).href;
+      const redirect = config.authRedirectUrl || new URL("manage.html", location.href).href;
       const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } });
       if (error) throw error;
     },
