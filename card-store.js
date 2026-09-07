@@ -1,6 +1,6 @@
 (() => {
   const KEY = "data-science-quiz-library-v1";
-  const blank = () => ({ version: 1, edits: {}, custom: {}, trash: [], deleted: [], mastery: {} });
+  const blank = () => ({ version: 1, updatedAt: null, edits: {}, custom: {}, trash: [], deleted: [], mastery: {}, sessions: {} });
   const clone = value => JSON.parse(JSON.stringify(value));
   const builtInCards = () => Object.values(window.QUIZ_DATA.topics).flatMap(topic => topic.cards);
 
@@ -10,11 +10,21 @@
     if (!value || value.version !== 1 || typeof value.edits !== "object") return blank();
     value.custom = value.custom && typeof value.custom === "object" ? value.custom : {};
     value.mastery = value.mastery && typeof value.mastery === "object" ? value.mastery : {};
+    value.sessions = value.sessions && typeof value.sessions === "object" ? value.sessions : {};
     value.trash = Array.isArray(value.trash) ? value.trash : [];
     value.deleted = Array.isArray(value.deleted) ? value.deleted : [];
     return value;
   }
-  const save = state => localStorage.setItem(KEY, JSON.stringify(state));
+  const save = state => {
+    state.updatedAt = new Date().toISOString();
+    localStorage.setItem(KEY, JSON.stringify(state));
+    window.dispatchEvent(new CustomEvent("cardstorechange", { detail: clone(state) }));
+  };
+  const replaceState = state => {
+    const next = { ...blank(), ...clone(state), version: 1 };
+    localStorage.setItem(KEY, JSON.stringify(next));
+    window.dispatchEvent(new CustomEvent("cardstoreloaded", { detail: clone(next) }));
+  };
   const allKnownCards = state => builtInCards().concat(Object.values(state.custom));
   const knownIds = state => new Set(allKnownCards(state).map(card => card.ID));
 
@@ -62,7 +72,12 @@
   function edit(id, fields) {
     const state = load();
     if (!knownIds(state).has(id)) throw new Error("Unknown card");
-    state.edits[id] = cleanFields(fields); save(state);
+    const clean = cleanFields(fields);
+    const original = allKnownCards(state).find(card => card.ID === id);
+    const changed = Object.fromEntries(Object.entries(clean).filter(([field, value]) => value !== original[field]));
+    if (Object.keys(changed).length) state.edits[id] = changed;
+    else delete state.edits[id];
+    save(state);
   }
   function create(deck, fields) {
     if (!window.QUIZ_DATA.topics[deck]) throw new Error("Unknown topic");
@@ -115,6 +130,8 @@
     return result;
   }
   function resetProgress() { const state = load(); state.mastery = {}; save(state); }
+  function getSession(key) { return clone(load().sessions[key] || null); }
+  function setSession(key, value) { const state = load(); state.sessions[key] = clone(value); save(state); }
 
   function backup() {
     return JSON.stringify({ app: "Data Science Quiz", exportedAt: new Date().toISOString(), library: load() }, null, 2);
@@ -141,5 +158,5 @@
     save(state);
   }
 
-  window.CardStore = { load, effectiveData, find, edit, create, resetEdit, isCustom, trash, restore, emptyTrash, isEdited, trashCards, recordResult, progress, resetProgress, backup, importBackup };
+  window.CardStore = { load, replaceState, effectiveData, find, edit, create, resetEdit, isCustom, trash, restore, emptyTrash, isEdited, trashCards, recordResult, progress, resetProgress, getSession, setSession, backup, importBackup };
 })();

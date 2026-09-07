@@ -1,4 +1,5 @@
-(() => {
+(async () => {
+  await CloudSync.ready;
   const data = CardStore.effectiveData();
   function ringFor(cards) {
     const value = CardStore.progress(cards);

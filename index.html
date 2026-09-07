@@ -29,8 +29,11 @@
     <div class="progress-legend"><span><i class="green"></i>Answered</span><span><i class="red"></i>Didn’t answer</span><span><i class="gray"></i>Not attempted</span></div>
     <a class="manage-link" href="manage.html">Manage and edit cards</a>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="cards.js"></script>
   <script src="card-store.js"></script>
+  <script src="cloud-sync.js"></script>
   <script src="home.js"></script>
   <script>if (location.protocol === "https:" && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
 </body>

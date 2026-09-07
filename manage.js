@@ -1,10 +1,25 @@
-(() => {
+(async () => {
+  await CloudSync.ready;
   const activePanel = document.getElementById("activePanel");
   const trashPanel = document.getElementById("trashPanel");
   const trashList = document.getElementById("trashList");
   const toast = document.getElementById("toast");
   const escape = value => value.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const notify = message => { toast.textContent = message; toast.classList.add("visible"); setTimeout(() => toast.classList.remove("visible"), 1800); };
+
+  function renderCloud(detail = {}) {
+    const state = detail.status || CloudSync.status;
+    const user = detail.user || CloudSync.user;
+    const status = document.getElementById("cloudStatus");
+    const form = document.getElementById("signInForm");
+    const actions = document.getElementById("signedInActions");
+    form.hidden = Boolean(user); actions.hidden = !user;
+    if (state === "synced") status.textContent = `${user.email} · Synced`;
+    else if (state === "syncing") status.textContent = "Syncing…";
+    else if (state === "error") status.textContent = `Sync error: ${detail.message || "try again"}`;
+    else if (state === "offline") status.textContent = "Offline · Changes stay on this device until connection returns.";
+    else status.textContent = "Sign in with the same email on every device.";
+  }
 
   function cardRow(card, trashed = false) {
     const edited = CardStore.isEdited(card.ID) ? '<span class="edited-badge">Edited</span>' : "";
@@ -50,6 +65,16 @@
     if (!confirm("Reset the green, red, and gray progress for every topic?")) return;
     CardStore.resetProgress(); notify("Progress reset");
   });
+  document.getElementById("signInForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = event.currentTarget.querySelector("button"); button.disabled = true;
+    try { await CloudSync.signIn(document.getElementById("emailInput").value.trim()); notify("Check your email for the sign-in link"); }
+    catch (error) { alert(error.message); }
+    button.disabled = false;
+  });
+  document.getElementById("syncNow").addEventListener("click", async () => { await CloudSync.syncNow(); render(); renderCloud(); });
+  document.getElementById("signOut").addEventListener("click", async () => { await CloudSync.signOut(); renderCloud(); });
+  window.addEventListener("cloudsyncstatus", event => { renderCloud(event.detail); if (event.detail.status === "synced") render(); });
   document.getElementById("exportData").addEventListener("click", async () => {
     const file = new File([CardStore.backup()], `data-science-quiz-${new Date().toISOString().slice(0,10)}.json`, {type:"application/json"});
     if (navigator.canShare?.({files:[file]})) { await navigator.share({files:[file], title:"Quiz backup"}).catch(() => {}); return; }
@@ -61,5 +86,5 @@
     catch (_) { alert("This file is not a valid quiz backup."); }
     event.target.value = "";
   });
-  render();
+  render(); renderCloud();
 })();

@@ -7,12 +7,18 @@
   <title>Manage cards · Data Science Quiz</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <script defer src="cards.js"></script><script defer src="card-store.js"></script><script defer src="manage.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="supabase-config.js"></script>
+  <script defer src="cards.js"></script><script defer src="card-store.js"></script><script defer src="cloud-sync.js"></script><script defer src="manage.js"></script>
 </head>
 <body>
   <header><div class="bar"><a class="back" href="index.html" aria-label="Back">‹</a><strong>Card library</strong></div></header>
   <main class="manage-wrap">
     <h1>Manage cards</h1>
+    <section class="cloud-panel">
+      <div><strong>Cloud sync</strong><p id="cloudStatus">Checking account…</p></div>
+      <form id="signInForm" class="sign-in-form"><input id="emailInput" type="email" autocomplete="email" placeholder="Email" required><button class="primary" type="submit">Send sign-in link</button></form>
+      <div id="signedInActions" class="signed-in-actions" hidden><button class="secondary" id="syncNow">Sync now</button><button class="secondary" id="signOut">Sign out</button></div>
+    </section>
     <div class="library-actions">
       <a class="secondary add-card" href="edit.html?new=1">Add card</a>
       <button class="secondary" id="exportData">Export backup</button>

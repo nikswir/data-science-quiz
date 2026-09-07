@@ -1,4 +1,5 @@
-(() => {
+(async () => {
+  await CloudSync.ready;
   const params = new URLSearchParams(location.search);
   const isNew = params.get("new") === "1";
   const id = params.get("id");

@@ -1,4 +1,5 @@
-(() => {
+(async () => {
+  await CloudSync.ready;
   const $ = id => document.getElementById(id);
   const quizData = CardStore.effectiveData();
   const params = new URLSearchParams(location.search);
@@ -16,7 +17,8 @@
   }
   const byId = Object.fromEntries(cards.map(card => [card.ID, card]));
   const allIds = cards.map(card => card.ID);
-  const storageKey = "data-science-quiz-session-v3:" + topicIds.join(",");
+  const storageKey = "session-v3:" + topicIds.join(",");
+  const legacyStorageKey = "data-science-quiz-session-v3:" + topicIds.join(",");
   let revealed = false;
 
   const shuffle = values => {
@@ -30,10 +32,14 @@
   const fresh = () => ({ version:3, stage:"training", primary:[...allIds], finalists:[], current:null, finalOrder:[], finalPosition:0, finalFailed:[], attempts:0, finals:0 });
   const valid = state => state && state.version === 3 && [...state.primary, ...state.finalists].every(id => byId[id]) && new Set([...state.primary, ...state.finalists]).size === allIds.length;
   let state;
-  try { state = JSON.parse(localStorage.getItem(storageKey)); } catch (_) {}
+  state = CardStore.getSession(storageKey);
+  if (!state) {
+    try { state = JSON.parse(localStorage.getItem(legacyStorageKey)); } catch (_) {}
+    if (state) { CardStore.setSession(storageKey, state); localStorage.removeItem(legacyStorageKey); }
+  }
   if (!valid(state) || state.stage === "passed") state = fresh();
 
-  function save() { localStorage.setItem(storageKey, JSON.stringify(state)); }
+  function save() { CardStore.setSession(storageKey, state); }
   function randomPrimary(exclude) {
     const choices = state.primary.length > 1 ? state.primary.filter(id => id !== exclude) : state.primary;
     return choices[Math.floor(Math.random() * choices.length)];
