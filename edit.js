@@ -97,15 +97,34 @@
     window.scrollTo(0, 0);
   });
 
-  $("saveCard").addEventListener("click", () => {
+  function returnToPreviousPage() {
+    const target = new URL(backUrl, location.href);
+    target.searchParams.set("saved", Date.now().toString());
+    location.replace(target.href);
+  }
+
+  $("saveCard").addEventListener("click", async () => {
     const value = values();
     if (!fields.Question.value.trim() || !fields.Short.textContent.trim()) {
       alert(russian ? "Заполните вопрос и короткий ответ." : "Question and short answer cannot be empty.");
       return;
     }
-    if (isNew) CardStore.create(deckInput.value, value);
-    else CardStore.edit(id, value);
-    location.href = backUrl;
+    const button = $("saveCard");
+    button.disabled = true;
+    button.textContent = russian ? "Сохраняю…" : "Saving…";
+    try {
+      if (isNew) CardStore.create(deckInput.value, value);
+      else CardStore.edit(id, value);
+      const synced = await CloudSync.flush();
+      if (CloudSync.user && !synced) {
+        alert(russian ? "Изменение сохранено на этом устройстве, но синхронизация не удалась. Проверьте соединение и повторите Sync." : "Saved on this device, but cloud sync failed. Check the connection and run Sync again.");
+      }
+      returnToPreviousPage();
+    } catch (error) {
+      alert(error.message || (russian ? "Не удалось сохранить карточку." : "Could not save the card."));
+      button.disabled = false;
+      button.textContent = isNew ? "Add card" : (russian ? "Сохранить перевод" : "Save English side");
+    }
   });
   $("restoreOriginal").addEventListener("click", () => {
     const message = russian ? "Очистить русский перевод этой карточки? Английская сторона останется без изменений." : "Discard your English edits and restore the original English card?";

@@ -148,6 +148,14 @@
   $("resetSession").addEventListener("click", () => {
     if (confirm("Start this session again from the beginning?")) restart();
   });
+  document.querySelectorAll('a[href="index.html"]').forEach(link => link.addEventListener("click", async event => {
+    event.preventDefault();
+    await CloudSync.flush();
+    location.href = link.href;
+  }));
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) location.reload();
+  });
   if (location.protocol === "https:" && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
   render();
 })();

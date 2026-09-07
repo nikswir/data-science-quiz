@@ -37,7 +37,19 @@
 
   function schedulePush() {
     if (!user) return;
-    clearTimeout(timer); timer = setTimeout(pushNow, 700);
+    clearTimeout(timer); timer = setTimeout(pushNow, 150);
+  }
+
+  async function flush() {
+    clearTimeout(timer);
+    timer = null;
+    if (!user) return true;
+    if (pushing) {
+      queued = true;
+      while (pushing) await new Promise(resolve => setTimeout(resolve, 25));
+      queued = false;
+    }
+    return pushNow();
   }
 
   async function reconcile(session) {
@@ -51,7 +63,7 @@
     const lastSynced = asTime(localStorage.getItem(metaKey(user.id)));
     const localTime = asTime(local.updatedAt);
     const remoteTime = asTime(data.updated_at || data.payload?.updatedAt);
-    if (lastSynced && localTime > lastSynced && localTime > remoteTime) {
+    if (localTime > remoteTime && (!lastSynced || localTime > lastSynced)) {
       await pushNow(); return;
     }
     CardStore.replaceState(data.payload);
@@ -68,6 +80,7 @@
 
   window.addEventListener("cardstorechange", schedulePush);
   window.addEventListener("online", () => { if (user) reconcile({ user }); });
+  window.addEventListener("pagehide", () => { if (user) pushNow(); });
   window.CloudSync = {
     ready, client,
     get user() { return user; }, get status() { return status; },
@@ -79,5 +92,6 @@
     },
     async signOut() { if (client) await client.auth.signOut(); },
     syncNow: () => user ? reconcile({ user }) : Promise.resolve(false),
+    flush,
   };
 })();

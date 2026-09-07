@@ -1,6 +1,5 @@
 (async () => {
   await CloudSync.ready;
-  const data = CardStore.effectiveData();
   function ringFor(cards) {
     const value = CardStore.progress(cards);
     const correct = value.total ? value.correct / value.total * 360 : 0;
@@ -13,15 +12,33 @@
     ring.setAttribute("aria-label", ring.title);
     return ring;
   }
-  let total = 0;
-  const allCards = [];
-  for (const [code, topic] of Object.entries(data.topics)) {
-    const count = topic.cards.length;
-    total += count; allCards.push(...topic.cards);
-    const node = document.querySelector(`[data-count="${code}"]`);
-    if (node) { node.textContent = count; node.before(ringFor(topic.cards)); }
+
+  function renderProgress() {
+    const data = CardStore.effectiveData();
+    let total = 0;
+    const allCards = [];
+    for (const [code, topic] of Object.entries(data.topics)) {
+      const count = topic.cards.length;
+      total += count; allCards.push(...topic.cards);
+      const node = document.querySelector(`[data-count="${code}"]`);
+      if (node) {
+        node.parentElement.querySelector(".progress-ring")?.remove();
+        node.textContent = count;
+        node.before(ringFor(topic.cards));
+      }
+    }
+    const allCount = document.querySelector('[data-count="all"]');
+    allCount.parentElement.querySelector(".progress-ring")?.remove();
+    allCount.textContent = total;
+    allCount.before(ringFor(allCards));
+    document.getElementById("totalCount").textContent = `${total} questions`;
   }
-  const allCount = document.querySelector('[data-count="all"]');
-  allCount.textContent = total; allCount.before(ringFor(allCards));
-  document.getElementById("totalCount").textContent = `${total} questions`;
+
+  window.addEventListener("pageshow", renderProgress);
+  window.addEventListener("cardstorechange", renderProgress);
+  window.addEventListener("cardstoreloaded", renderProgress);
+  window.addEventListener("cloudsyncstatus", event => {
+    if (event.detail.status === "synced") renderProgress();
+  });
+  renderProgress();
 })();
