@@ -19,6 +19,8 @@
   const allIds = cards.map(card => card.ID);
   const storageKey = "session-v3:" + topicIds.join(",");
   const legacyStorageKey = "data-science-quiz-session-v3:" + topicIds.join(",");
+  const languageKey = "data-science-quiz-language";
+  let language = localStorage.getItem(languageKey) === "ru" ? "ru" : "en";
   let revealed = false;
 
   const shuffle = values => {
@@ -49,17 +51,38 @@
     state.finalOrder = shuffle(allIds); state.finalPosition = 0; state.finalFailed = [];
     state.current = state.finalOrder[0];
   }
+  function renderCardContent(card) {
+    const russian = language === "ru";
+    const hasRussian = Boolean(card.QuestionRu?.trim() || card.ShortRu?.replace(/<[^>]*>/g, "").trim());
+    $("topic").textContent = russian ? (card.TopicRu || card.Topic) : card.Topic;
+    $("question").textContent = russian ? (card.QuestionRu || "Русская версия пока не добавлена") : card.Question;
+    $("short").innerHTML = russian
+      ? (card.ShortRu || "<p>Нажмите на карандаш, чтобы добавить русский текст этой карточки.</p>")
+      : card.Short;
+    $("long").innerHTML = russian ? (card.LongRu || "") : card.Long;
+    $("readings").innerHTML = russian ? (card.ReadingsRu || "") : card.Readings;
+    $("shortLabel").textContent = russian ? "Короткий ответ" : "Short answer";
+    $("longLabel").textContent = russian ? "Подробный ответ" : "Long answer";
+    $("readingLabel").textContent = russian ? "Произношение формул" : "Formula pronunciation";
+    $("longBox").hidden = !(russian ? card.LongRu : card.Long)?.trim();
+    $("readingBox").hidden = !(russian ? card.ReadingsRu : card.Readings)?.trim();
+    const sideName = russian ? "Russian" : "English";
+    const otherSide = russian ? "English" : "Russian";
+    $("editCard").href = `edit.html?id=${encodeURIComponent(card.ID)}&lang=${language}&return=${encodeURIComponent("quiz.html" + location.search)}`;
+    $("editCard").setAttribute("aria-label", `Edit ${sideName} side`);
+    $("editCard").title = `Edit ${sideName} side`;
+    $("flipLanguage").setAttribute("aria-label", `Show ${otherSide} side`);
+    $("flipLanguage").title = `Show ${otherSide} side`;
+    $("flipLanguage").classList.toggle("showing-russian", russian);
+    $("flipLanguage").classList.toggle("translation-missing", russian && !hasRussian);
+  }
   function render() {
     if (!state.current && state.stage === "training") state.current = randomPrimary(null);
     if (state.stage === "passed") return showResult();
     const card = byId[state.current];
     revealed = false; document.body.classList.remove("revealed");
     $("answer").classList.remove("visible"); $("longBox").open = false; $("readingBox").open = false;
-    $("topic").textContent = card.Topic; $("question").textContent = card.Question;
-    $("short").innerHTML = card.Short; $("long").innerHTML = card.Long; $("readings").innerHTML = card.Readings;
-    $("longBox").hidden = !card.Long.trim();
-    $("readingBox").hidden = !card.Readings.trim();
-    $("editCard").href = `edit.html?id=${encodeURIComponent(card.ID)}&return=${encodeURIComponent("quiz.html" + location.search)}`;
+    renderCardContent(card);
     const final = state.stage === "final";
     $("stage").textContent = final ? `Final ${state.finals}` : "Training";
     $("stage").classList.toggle("final", final);
@@ -111,7 +134,17 @@
   $("wrong").addEventListener("click", () => grade(false));
   $("correct").addEventListener("click", () => grade(true));
   $("newSession").addEventListener("click", restart);
-  $("trashCard").addEventListener("click", () => { CardStore.trash(state.current); location.reload(); });
+  $("flipLanguage").addEventListener("click", () => {
+    const view = $("cardView");
+    view.classList.add("flipping");
+    setTimeout(() => {
+      language = language === "en" ? "ru" : "en";
+      localStorage.setItem(languageKey, language);
+      renderCardContent(byId[state.current]);
+      view.classList.remove("flipping");
+      if (revealed && window.MathJax?.typesetPromise) MathJax.typesetPromise([$("answer")]).catch(console.error);
+    }, 130);
+  });
   $("resetSession").addEventListener("click", () => {
     if (confirm("Start this session again from the beginning?")) restart();
   });

@@ -15,15 +15,15 @@
   <main class="editor-wrap">
     <div id="editView">
       <label class="field-label" id="deckField" hidden>Topic<select id="deckInput" class="text-input"></select></label>
-      <label class="field-label">Topic<input id="topicInput" class="text-input"></label>
-      <label class="field-label">Question<textarea id="questionInput" class="text-input question-input" rows="2"></textarea></label>
+      <label class="field-label"><span id="topicLabel">Topic</span><input id="topicInput" class="text-input"></label>
+      <label class="field-label"><span id="questionLabel">Question</span><textarea id="questionInput" class="text-input question-input" rows="2"></textarea></label>
       <div class="editor-toolbar" aria-label="Formatting">
         <button data-command="bold"><b>Bold</b></button><button data-block="p">Paragraph</button><button data-block="h3">Heading</button><button id="insertSection">Add section</button>
       </div>
-      <label class="field-label">Short answer<div id="shortInput" class="rich-input" contenteditable="true"></div></label>
-      <label class="field-label">Long answer<div id="longInput" class="rich-input long-input" contenteditable="true"></div></label>
-      <label class="field-label">Formula pronunciation<div id="readingsInput" class="rich-input" contenteditable="true"></div></label>
-      <p class="editor-hint">Formulas appear as LaTeX while editing. Keep the text between <code>\(</code> and <code>\)</code> intact unless you want to change the formula.</p>
+      <label class="field-label"><span id="shortEditorLabel">Short answer</span><div id="shortInput" class="rich-input" contenteditable="true"></div></label>
+      <label class="field-label"><span id="longEditorLabel">Long answer</span><div id="longInput" class="rich-input long-input" contenteditable="true"></div></label>
+      <label class="field-label"><span id="readingsEditorLabel">Formula pronunciation</span><div id="readingsInput" class="rich-input" contenteditable="true"></div></label>
+      <p class="editor-hint" id="editorHint">Formulas appear as LaTeX while editing. Keep the text between <code>\(</code> and <code>\)</code> intact unless you want to change the formula.</p>
     </div>
     <section id="previewView" class="editor-preview" hidden>
       <div class="topic" id="previewTopic"></div><h1 id="previewQuestion"></h1>
@@ -35,6 +35,10 @@
       <button class="secondary" id="togglePreview">Preview</button>
       <button class="secondary" id="restoreOriginal">Restore original</button>
       <button class="primary" id="saveCard">Save card</button>
+    </div>
+    <div class="editor-danger-zone" id="dangerZone">
+      <button class="delete-card" id="deleteCard">Move to trash</button>
+      <small>You can restore this card later from Manage cards → Trash.</small>
     </div>
   </main>
 </body>

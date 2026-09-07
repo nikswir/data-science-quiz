@@ -18,9 +18,16 @@ header { position:sticky; top:0; z-index:2; padding:calc(10px + env(safe-area-in
 .wrap { padding:24px 16px calc(120px + env(safe-area-inset-bottom)); }
 .topic,.eyebrow { color:var(--muted); font-size:14px; }
 .card-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-.card-actions { display:flex; align-items:center; gap:6px; }
-.icon-action { width:auto; padding:6px 9px; border-radius:9px; color:var(--accent); background:transparent; font:700 13px/1.2 inherit; text-decoration:none; }
-.icon-action.danger { color:var(--bad); }
+.card-actions { display:flex; align-items:center; gap:4px; }
+.icon-action { width:38px; height:38px; display:grid; place-items:center; padding:7px; border-radius:50%; color:var(--accent); background:transparent; text-decoration:none; }
+.icon-action:active { background:var(--soft); }
+.icon-action svg { width:22px; height:22px; fill:currentColor; }
+.translate-icon { position:relative; font:800 17px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; letter-spacing:-2px; }
+.translate-icon span { color:var(--muted); font-size:13px; vertical-align:-5px; }
+.showing-russian .translate-icon span { color:var(--accent); }
+.showing-russian .translate-icon { color:var(--muted); }
+#cardView { transform-style:preserve-3d; transition:transform .13s ease,opacity .13s ease; }
+#cardView.flipping { transform:rotateY(90deg); opacity:.15; }
 h1 { font-size:clamp(26px,7vw,38px); line-height:1.25; margin:12px 0 28px; }
 h2 { color:var(--accent); font-size:21px; margin:28px 0 10px; }
 h3,h4 { font-size:17px; margin:14px 0 8px; }
@@ -67,10 +74,6 @@ button { border:0; border-radius:13px; padding:14px 16px; font:700 16px/1.2 inhe
 .progress-ring { --correct-angle:0deg; --wrong-angle:0deg; position:relative; flex:0 0 28px; width:28px; height:28px; margin-left:auto; border-radius:50%; background:conic-gradient(var(--good) 0 var(--correct-angle),var(--bad) var(--correct-angle) var(--wrong-angle),var(--line) var(--wrong-angle) 360deg); }
 .progress-ring::after { content:""; position:absolute; inset:5px; border-radius:50%; background:var(--surface); }
 .topic-row .progress-ring + .count { margin-left:0; }
-.progress-legend { display:flex; justify-content:center; flex-wrap:wrap; gap:8px 14px; margin:16px 4px 0; color:var(--muted); font-size:12px; }
-.progress-legend span { display:flex; align-items:center; gap:5px; }
-.progress-legend i { width:9px; height:9px; border-radius:50%; background:var(--line); }
-.progress-legend .green { background:var(--good); }.progress-legend .red { background:var(--bad); }.progress-legend .gray { background:var(--line); }
 .topic-row.all { color:var(--accent); }
 .manage-link { display:block; width:max-content; margin:24px auto; color:var(--accent); font-weight:700; text-decoration:none; }
 table { width:100%; border-collapse:collapse; font-size:15px; }
@@ -120,6 +123,10 @@ mjx-container[jax="CHTML"][display="true"] { margin:.7em 0!important; background
 .editor-toolbar button { flex:none; padding:8px 10px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:13px; }
 .editor-footer { position:sticky; bottom:0; z-index:3; padding:12px 0 calc(12px + env(safe-area-inset-bottom)); background:color-mix(in srgb,var(--bg) 94%,transparent); backdrop-filter:blur(10px); }
 .editor-footer .primary { flex:1; min-width:120px; }
+.editor-danger-zone { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:30px; padding:20px 0; border-top:1px solid var(--line); color:var(--muted); }
+.editor-danger-zone small { max-width:390px; }
+.delete-card { flex:none; border:1px solid color-mix(in srgb,var(--bad) 55%,var(--line)); background:transparent; color:var(--bad); }
 .editor-preview { padding-bottom:20px; }
 @media (max-width:520px) { .library-card { align-items:flex-start; } .library-card strong { font-size:14px; } .row-actions { flex-direction:column; } .trash-head { align-items:flex-start; flex-direction:column; } }
 @media (max-width:520px) { .sign-in-form { flex-direction:column; } .sign-in-form .primary { width:100%; } }
+@media (max-width:520px) { .editor-danger-zone { align-items:stretch; flex-direction:column; } .delete-card { width:100%; } }

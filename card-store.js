@@ -62,9 +62,10 @@
 
   function cleanFields(fields) {
     const clean = {};
-    for (const field of ["Topic", "Question", "Short", "Long", "Readings"]) {
+    const textFields = new Set(["Topic", "Question", "TopicRu", "QuestionRu"]);
+    for (const field of ["Topic", "Question", "Short", "Long", "Readings", "TopicRu", "QuestionRu", "ShortRu", "LongRu", "ReadingsRu"]) {
       if (typeof fields[field] !== "string") continue;
-      clean[field] = field === "Topic" || field === "Question" ? fields[field].trim() : sanitize(fields[field]);
+      clean[field] = textFields.has(field) ? fields[field].trim() : sanitize(fields[field]);
     }
     return clean;
   }
@@ -74,7 +75,11 @@
     if (!knownIds(state).has(id)) throw new Error("Unknown card");
     const clean = cleanFields(fields);
     const original = allKnownCards(state).find(card => card.ID === id);
-    const changed = Object.fromEntries(Object.entries(clean).filter(([field, value]) => value !== original[field]));
+    const changed = { ...(state.edits[id] || {}) };
+    for (const [field, value] of Object.entries(clean)) {
+      if (value !== (original[field] || "")) changed[field] = value;
+      else delete changed[field];
+    }
     if (Object.keys(changed).length) state.edits[id] = changed;
     else delete state.edits[id];
     save(state);
@@ -89,6 +94,13 @@
     save(state); return id;
   }
   function resetEdit(id) { const state = load(); delete state.edits[id]; save(state); }
+  function resetFields(id, fields) {
+    const state = load();
+    if (!state.edits[id]) return;
+    for (const field of fields) delete state.edits[id][field];
+    if (!Object.keys(state.edits[id]).length) delete state.edits[id];
+    save(state);
+  }
   function isCustom(id) { return Boolean(load().custom[id]); }
   function trash(id) {
     const state = load();
@@ -158,5 +170,5 @@
     save(state);
   }
 
-  window.CardStore = { load, replaceState, effectiveData, find, edit, create, resetEdit, isCustom, trash, restore, emptyTrash, isEdited, trashCards, recordResult, progress, resetProgress, getSession, setSession, backup, importBackup };
+  window.CardStore = { load, replaceState, effectiveData, find, edit, create, resetEdit, resetFields, isCustom, trash, restore, emptyTrash, isEdited, trashCards, recordResult, progress, resetProgress, getSession, setSession, backup, importBackup };
 })();

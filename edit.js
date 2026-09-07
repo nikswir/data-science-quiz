@@ -1,34 +1,69 @@
 (async () => {
   await CloudSync.ready;
+  const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
   const isNew = params.get("new") === "1";
+  const language = !isNew && params.get("lang") === "ru" ? "ru" : "en";
+  const russian = language === "ru";
+  const suffix = russian ? "Ru" : "";
   const id = params.get("id");
-  const card = isNew ? { Topic: "7 · Custom card", Question: "", Short: "<p></p>", Long: "<p></p>", Readings: "" } : CardStore.find(id);
+  const emptyCard = { Topic: "7 · Custom card", Question: "", Short: "<p></p>", Long: "<p></p>", Readings: "" };
+  const card = isNew ? emptyCard : CardStore.find(id);
   if (!card) { location.replace("manage.html"); return; }
+
   let backUrl = params.get("return") || "manage.html";
   try {
     const target = new URL(backUrl, location.href);
     backUrl = target.origin === location.origin ? target.href : "manage.html";
   } catch (_) { backUrl = "manage.html"; }
-  document.getElementById("backLink").href = backUrl;
-  const deckInput = document.getElementById("deckInput");
+  $("backLink").href = backUrl;
+
+  const deckInput = $("deckInput");
   for (const [code, topic] of Object.entries(QUIZ_DATA.topics)) {
-    const option = document.createElement("option"); option.value = code; option.textContent = `Topic ${code} · ${topic.title}`; deckInput.append(option);
+    const option = document.createElement("option");
+    option.value = code; option.textContent = `Topic ${code} · ${topic.title}`; deckInput.append(option);
   }
   deckInput.value = params.get("topic") && QUIZ_DATA.topics[params.get("topic")] ? params.get("topic") : "07";
-  document.getElementById("deckField").hidden = !isNew;
-  document.getElementById("editorTitle").textContent = isNew ? "Add card" : "Edit card";
-  document.getElementById("saveCard").textContent = isNew ? "Add card" : "Save card";
-  document.getElementById("restoreOriginal").hidden = isNew;
-  const fields = {
-    Topic: document.getElementById("topicInput"), Question: document.getElementById("questionInput"),
-    Short: document.getElementById("shortInput"), Long: document.getElementById("longInput"), Readings: document.getElementById("readingsInput"),
-  };
-  function fill(value) {
-    fields.Topic.value = value.Topic; fields.Question.value = value.Question;
-    fields.Short.innerHTML = value.Short; fields.Long.innerHTML = value.Long; fields.Readings.innerHTML = value.Readings;
+  $("deckField").hidden = !isNew;
+  $("dangerZone").hidden = isNew;
+  $("editorTitle").textContent = isNew ? "Add card" : (russian ? "Редактировать русскую сторону" : "Edit English side");
+  $("saveCard").textContent = isNew ? "Add card" : (russian ? "Сохранить перевод" : "Save English side");
+  $("restoreOriginal").hidden = isNew;
+  $("restoreOriginal").textContent = russian ? "Очистить русскую сторону" : "Restore English original";
+  document.documentElement.lang = russian ? "ru" : "en";
+
+  if (russian) {
+    $("topicLabel").textContent = "Тема";
+    $("questionLabel").textContent = "Вопрос";
+    $("shortEditorLabel").textContent = "Короткий ответ";
+    $("longEditorLabel").textContent = "Подробный ответ";
+    $("readingsEditorLabel").textContent = "Произношение формул";
+    $("editorHint").innerHTML = "Формулы отображаются через LaTeX. Не меняйте текст между <code>\\(</code> и <code>\\)</code>, если сама формула должна остаться прежней.";
   }
-  const values = () => ({ Topic: fields.Topic.value, Question: fields.Question.value, Short: fields.Short.innerHTML, Long: fields.Long.innerHTML, Readings: fields.Readings.innerHTML });
+
+  const fields = {
+    Topic: $("topicInput"), Question: $("questionInput"), Short: $("shortInput"),
+    Long: $("longInput"), Readings: $("readingsInput"),
+  };
+  const sourceKey = name => name + suffix;
+  function fill(value) {
+    fields.Topic.value = value[sourceKey("Topic")] || "";
+    fields.Question.value = value[sourceKey("Question")] || "";
+    fields.Short.innerHTML = value[sourceKey("Short")] || "";
+    fields.Long.innerHTML = value[sourceKey("Long")] || "";
+    fields.Readings.innerHTML = value[sourceKey("Readings")] || "";
+    if (russian) {
+      fields.Topic.placeholder = value.Topic || "Название темы на русском (необязательно)";
+      fields.Question.placeholder = "Введите вопрос на русском";
+    }
+  }
+  const values = () => ({
+    [sourceKey("Topic")]: fields.Topic.value,
+    [sourceKey("Question")]: fields.Question.value,
+    [sourceKey("Short")]: fields.Short.innerHTML,
+    [sourceKey("Long")]: fields.Long.innerHTML,
+    [sourceKey("Readings")]: fields.Readings.innerHTML,
+  });
   fill(card);
   deckInput.addEventListener("change", () => {
     if (/^\d+ · Custom card$/.test(fields.Topic.value)) fields.Topic.value = `${Number(deckInput.value)} · Custom card`;
@@ -38,36 +73,48 @@
   [fields.Short, fields.Long, fields.Readings].forEach(editor => editor.addEventListener("focus", () => activeEditor = editor));
   document.querySelectorAll("[data-command]").forEach(button => button.addEventListener("click", () => { activeEditor.focus(); document.execCommand(button.dataset.command); }));
   document.querySelectorAll("[data-block]").forEach(button => button.addEventListener("click", () => { activeEditor.focus(); document.execCommand("formatBlock", false, button.dataset.block); }));
-  document.getElementById("insertSection").addEventListener("click", () => {
-    activeEditor.focus(); document.execCommand("insertHTML", false, "<h3>New section</h3><p>Write the explanation here.</p>");
+  $("insertSection").addEventListener("click", () => {
+    activeEditor.focus();
+    document.execCommand("insertHTML", false, russian ? "<h3>Новый раздел</h3><p>Добавьте объяснение.</p>" : "<h3>New section</h3><p>Write the explanation here.</p>");
   });
 
-  const editView = document.getElementById("editView");
-  const previewView = document.getElementById("previewView");
-  const toggle = document.getElementById("togglePreview");
+  const editView = $("editView");
+  const previewView = $("previewView");
+  const toggle = $("togglePreview");
+  toggle.textContent = russian ? "Предпросмотр" : "Preview";
   toggle.addEventListener("click", async () => {
     const opening = previewView.hidden;
     editView.hidden = opening; previewView.hidden = !opening;
-    toggle.textContent = opening ? "Continue editing" : "Preview";
+    toggle.textContent = opening ? (russian ? "Продолжить редактирование" : "Continue editing") : (russian ? "Предпросмотр" : "Preview");
     if (!opening) return;
     const value = values();
-    document.getElementById("previewTopic").textContent = value.Topic;
-    document.getElementById("previewQuestion").textContent = value.Question;
-    document.getElementById("previewShort").innerHTML = value.Short;
-    document.getElementById("previewLong").innerHTML = value.Long;
-    document.getElementById("previewReadings").innerHTML = value.Readings;
+    $("previewTopic").textContent = value[sourceKey("Topic")];
+    $("previewQuestion").textContent = value[sourceKey("Question")];
+    $("previewShort").innerHTML = value[sourceKey("Short")];
+    $("previewLong").innerHTML = value[sourceKey("Long")];
+    $("previewReadings").innerHTML = value[sourceKey("Readings")];
     if (window.MathJax?.typesetPromise) await MathJax.typesetPromise([previewView]);
     window.scrollTo(0, 0);
   });
-  document.getElementById("saveCard").addEventListener("click", () => {
+
+  $("saveCard").addEventListener("click", () => {
     const value = values();
-    if (!value.Question.trim() || !fields.Short.textContent.trim()) { alert("Question and short answer cannot be empty."); return; }
+    if (!fields.Question.value.trim() || !fields.Short.textContent.trim()) {
+      alert(russian ? "Заполните вопрос и короткий ответ." : "Question and short answer cannot be empty.");
+      return;
+    }
     if (isNew) CardStore.create(deckInput.value, value);
     else CardStore.edit(id, value);
     location.href = backUrl;
   });
-  document.getElementById("restoreOriginal").addEventListener("click", () => {
-    if (!confirm("Discard your edits and restore the original card?")) return;
-    CardStore.resetEdit(id); location.href = backUrl;
+  $("restoreOriginal").addEventListener("click", () => {
+    const message = russian ? "Очистить русский перевод этой карточки? Английская сторона останется без изменений." : "Discard your English edits and restore the original English card?";
+    if (!confirm(message)) return;
+    CardStore.resetFields(id, [sourceKey("Topic"), sourceKey("Question"), sourceKey("Short"), sourceKey("Long"), sourceKey("Readings")]);
+    location.href = backUrl;
+  });
+  $("deleteCard").addEventListener("click", () => {
+    CardStore.trash(id);
+    location.href = backUrl;
   });
 })();
