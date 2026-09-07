@@ -3,6 +3,21 @@
   const blank = () => ({ version: 1, updatedAt: null, edits: {}, custom: {}, trash: [], deleted: [], mastery: {}, sessions: {} });
   const clone = value => JSON.parse(JSON.stringify(value));
   const builtInCards = () => Object.values(window.QUIZ_DATA.topics).flatMap(topic => topic.cards);
+  const russianFields = ["TopicRu", "QuestionRu", "ShortRu", "LongRu", "ReadingsRu"];
+  const isBlank = value => typeof value === "string" && !value.replace(/<[^>]*>/g, "").replace(/&nbsp;|&#160;/gi, "").trim();
+  const hasContent = value => typeof value === "string" && !isBlank(value);
+
+  function discardStaleBlankTranslations(state) {
+    const originals = new Map(builtInCards().concat(Object.values(state.custom || {})).map(card => [card.ID, card]));
+    for (const [id, edits] of Object.entries(state.edits || {})) {
+      const original = originals.get(id);
+      if (!original || !edits || typeof edits !== "object") continue;
+      for (const field of russianFields) {
+        if (isBlank(edits[field]) && hasContent(original[field])) delete edits[field];
+      }
+      if (!Object.keys(edits).length) delete state.edits[id];
+    }
+  }
 
   function load() {
     let value;
@@ -13,6 +28,7 @@
     value.sessions = value.sessions && typeof value.sessions === "object" ? value.sessions : {};
     value.trash = Array.isArray(value.trash) ? value.trash : [];
     value.deleted = Array.isArray(value.deleted) ? value.deleted : [];
+    discardStaleBlankTranslations(value);
     return value;
   }
   const save = state => {
